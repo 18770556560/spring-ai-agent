@@ -1,0 +1,38 @@
+package com.cc.springaiagent.rag;
+
+import com.alibaba.cloud.ai.dashscope.api.DashScopeApi;
+import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetriever;
+import com.alibaba.cloud.ai.dashscope.rag.DashScopeDocumentRetrieverOptions;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
+import org.springframework.ai.rag.retrieval.search.DocumentRetriever;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+//@Configuration
+@Slf4j
+public class LoveAppRagCloudAdvisorConfig {
+
+    @Value("${spring.ai.dashscope.api-key}")
+    private String dashScopeApiKey;
+
+    @Bean
+    public Advisor loveAppRagCloudAdvisor() {
+
+        DashScopeApi dashScopeApi = DashScopeApi.builder()
+                .apiKey(dashScopeApiKey)  // 必填：密钥
+                // 可选：自定义网关地址（国内默认不用填，海外/私有部署才配baseUrl）
+                //.baseUrl("https://dashscope.aliyuncs.com/api/v1")
+                .build();
+        final String KNOWLEDGE_INDEX = "恋爱知识库";
+        DocumentRetriever documentRetriever = new DashScopeDocumentRetriever(dashScopeApi,
+                DashScopeDocumentRetrieverOptions.builder()
+                        .indexName(KNOWLEDGE_INDEX)
+                        .build());
+        return RetrievalAugmentationAdvisor.builder()
+                .documentRetriever(documentRetriever)
+                .build();
+    }
+}
