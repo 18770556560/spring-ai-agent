@@ -1,0 +1,90 @@
+spring:
+  # 其他配置（ai、alibaba、dashscope这些都保留不变）
+  jackson:
+    deserialization:
+      # 关键：遇到JSON里没有定义的字段，直接忽略不报错
+      fail-on-unknown-properties: false
+  ai:
+    alibaba:
+      toolcalling:
+        metaso:
+#          https://metaso.cn/search-api/api-keys 获取key
+          api-key: ${METASO_API_KEY}}
+
+        weather:
+          api-key: ${WEATHER_API_KEY}
+
+        baidu:
+          search:
+#            https://www.searchapi.io/  获取key
+            api-key: ${BAIDU_SEARCH_API_KEY}
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        options:
+          model: deepseek-r1:1.5b
+          temperature: 0.7
+    dashscope:
+      embedding:
+        options:
+          model: text-embedding-v3
+
+      api-key: ${DASHSCOPE_API_KEY}
+      chat:
+        options:
+          model: qwen-plus
+
+    vectorstore:
+      pgvector:
+        initialize-schema: true # 确保此值为 true
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 1024
+        max-document-batch-size: 10000 # Optional: Maximum number of documents per batch
+    mcp:
+#      server:
+#        enabled: true
+#        # 1. 启用 STDIO 传输
+#        stdio: true
+#        # 2. WebMVC 模式下默认就是 SSE，也可以显式指定
+#        protocol: SSE
+#        # 可选：配置SSE端点路径
+#        sse-endpoint: /sse
+#        sse-message-endpoint: /mcp/message
+#        type: sync
+      client:
+        stdio:
+          servers-configuration: classpath:mcp-servers.json
+#        sse:
+#          connections:
+#            servers1:
+#              url: http://localhost:8081
+        annotation-scanner:
+          enabled:  true
+        request-timeout: 30s
+        type: sync
+
+  datasource:
+    mysql:
+      # 1. 数据库驱动类名 (MySQL 8.0+ 使用 com.mysql.cj.jdbc.Driver)
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      # 2. 数据库连接 URL
+      # 注意替换：localhost:3306 为你的数据库地址，your_database 为你的库名
+      # useSSL=false: 关闭SSL验证(开发环境常用)
+      # serverTimezone=Asia/Shanghai: 设置时区，避免时间错误
+      # allowPublicKeyRetrieval=true: 允许公钥检索(解决某些连接认证问题)
+#      url: jdbc:mysql://localhost:3306/spring_ai_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      jdbc-url: jdbc:mysql://localhost:3306/spring_ai_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      # 3. 数据库用户名
+      username: root
+      # 4. 数据库密码
+      password: root
+    postgres:
+      jdbc-url: jdbc:postgresql://localhost:5432/postgres?useSSL=false
+      username: postgres
+      password: postgres
+      driver-class-name: org.postgresql.Driver
+
+# 关闭 Spring 自动数据源配置（关键）
+autoconfigure:
+  exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration

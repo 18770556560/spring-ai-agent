@@ -1,6 +1,5 @@
 package com.cc.springaiagent.demo.invoke;// 建议dashscope SDK的版本 >= 2.12.0
-import java.util.Arrays;
-import java.lang.System;
+
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
@@ -10,8 +9,19 @@ import com.alibaba.dashscope.exception.ApiException;
 import com.alibaba.dashscope.exception.InputRequiredException;
 import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.alibaba.dashscope.utils.JsonUtils;
+import org.springframework.beans.factory.annotation.Value;
+
+import java.util.Arrays;
 
 public class SdkAiInvoke {
+
+    @Value("${spring.ai.dashscope.api-key}")
+    private static String apiKey;
+    @Value("${spring.ai.dashscope.chat.options.model}")
+    private static String model;
+
+//    private static final String apiKey = "apikey";
+//    private static final String model = "apikey";
     public static GenerationResult callWithMessage() throws ApiException, NoApiKeyException, InputRequiredException {
         Generation gen = new Generation();
         Message systemMsg = Message.builder()
@@ -24,9 +34,9 @@ public class SdkAiInvoke {
                 .build();
         GenerationParam param = GenerationParam.builder()
                 // 若没有配置环境变量，请用百炼API Key将下行替换为：.apiKey("sk-xxx")
-                .apiKey(TestApiKey.myKey)
+                .apiKey(apiKey)
                 // 此处以qwen-plus为例，可按需更换模型名称。模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
-            .model(TestApiKey.model)
+            .model(model)
                 .messages(Arrays.asList(systemMsg, userMsg))
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                 .build();

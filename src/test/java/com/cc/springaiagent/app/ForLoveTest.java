@@ -85,7 +85,7 @@ class ForLoveTest {
     @Test
     void doChatWithTools() {
         String chatId = UUID.randomUUID().toString();
-        String message = "北京天气怎么样，最近有什么相关新闻吗，将内容输出pdf报告发给我，内容分成天气和新闻两个模块";
+        String message = "北京天气怎么样，最近有什么相关新闻吗，整理为有结构层次的内容并生成pdf报告";
         String answer =  forLove.doChatWithTools(message, chatId);
         Assertions.assertNotNull(answer);
     }
@@ -93,7 +93,7 @@ class ForLoveTest {
     @Test
     void doChatWithMcp() {
         String chatId = UUID.randomUUID().toString();
-        String message = "帮我找几张好看的小狗照片";
+        String message = "帮我找几张好看的小狗照片,不管图片地址有没有效，你只需要把你查到的图片地址给我就行";
         String answer =  forLove.doChatWithMcp(message, chatId);
         Assertions.assertNotNull(answer);
     }

@@ -1,0 +1,83 @@
+# Spring 应用基本配置
+spring:
+  profiles:
+    active: loc
+  application:
+    # 应用名称，用于服务注册与发现或日志标识
+    name: spring-ai-agent
+
+
+# 服务器配置
+server:
+  # 服务启动端口
+  port: 8080
+  servlet:
+    # 应用的上下文路径（Context Path），所有接口请求需加上此前缀，例如: http://localhost:8080/api/...
+    context-path: /api
+
+# SpringDoc OpenAPI 配置 (用于生成 Swagger/OpenAPI 文档)
+springdoc:
+  customizer:
+    global-operation-customizer: false
+  swagger-ui:
+    # Swagger UI 的访问路径，例如: http://localhost:8080/api/swagger-ui.html
+    path: /swagger-ui.html
+    # 标签排序方式：alpha 表示按字母顺序排序
+    tags-sorter: alpha
+    # 接口操作排序方式：alpha 表示按字母顺序排序
+    operations-sorter: alpha
+  api-docs:
+    # OpenAPI JSON/YAML 文档的访问路径，例如: http://localhost:8080/api/v3/api-docs
+    path: /v3/api-docs
+  group-configs:
+    - group: 'default'
+      # 匹配的路径模式，'/**' 表示包含所有接口
+      paths-to-match: '/**'
+      # 扫描 Controller 所在的包路径，注意这里使用的是斜杠，通常 Java 包名使用点号，请确认项目实际结构是否兼容或需调整为 com.cc.springaiagent.Controller
+      packages-to-scan: com.cc.springaiagent.controller
+
+# Knife4j 增强配置 (基于 SpringDoc 的增强 UI 工具)
+knife4j:
+  # 是否启用 Knife4j 增强功能
+  enable: true
+  setting:
+    # 界面语言设置，zh_cn 表示简体中文
+    language: zh_cn
+
+#日志等级
+#logging:
+#  level:
+#    org.springframework.ai.chat.client.advisor.MyLoggerAdvisor: debug
+
+
+
+# MyBatis-Plus 配置
+mybatis-plus:
+
+  # 5. Mapper XML 文件位置 (如果使用了XML方式写SQL)
+  # classpath*:mapper/**/*Mapper.xml 表示扫描所有模块下的 mapper 文件夹
+  mapper-locations: classpath*:mapper/**/*.xml
+
+  # 6. 实体类包路径 (用于类型别名，可选)
+  type-aliases-package: com.cc.springaiagent.entity
+
+  # 7. 全局配置
+  global-config:
+    db-config:
+      # 主键生成策略: ASSIGN_ID (雪花算法), AUTO (自增), INPUT (手动输入)
+      id-type: AUTO
+      # 逻辑删除字段名 (如果使用了逻辑删除功能)
+      logic-delete-field: is_deleted
+      # 逻辑删除值: 1表示已删除
+      logic-delete-value: 1
+      # 逻辑未删除值: 0表示未删除
+      logic-not-delete-value: 0
+
+  # 8. 原生 MyBatis 配置 (可选，如开启驼峰命名映射)
+  configuration:
+    # 是否开启自动驼峰命名规则映射: 从数据库列 user_name 映射到 Java 属性 userName
+    map-underscore-to-camel-case: true
+    # 打印 SQL 日志 (开发环境建议开启，生产环境建议关闭或使用 logback 配置)
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+

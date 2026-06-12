@@ -13,6 +13,8 @@ public class LangChainAiInvoke {
     private static String apiKey;
     @Value("${spring.ai.dashscope.chat.options.model}")
     private static String model;
+//    private static final String apiKey = "apikey";
+//    private static final String model = "apikey";
     public static void main(String[] args) {
         ChatModel qwenModel = QwenChatModel.builder()
                 .apiKey(apiKey)

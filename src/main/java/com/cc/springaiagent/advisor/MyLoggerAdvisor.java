@@ -1,6 +1,5 @@
 package com.cc.springaiagent.advisor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClientMessageAggregator;
@@ -11,10 +10,10 @@ import org.springframework.ai.chat.client.advisor.api.CallAdvisorChain;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisor;
 import org.springframework.ai.chat.client.advisor.api.StreamAdvisorChain;
 import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.UserMessage;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class MyLoggerAdvisor implements CallAdvisor, StreamAdvisor {
@@ -48,18 +47,11 @@ public class MyLoggerAdvisor implements CallAdvisor, StreamAdvisor {
     protected void logRequest(ChatClientRequest request){
         // 拿到本轮所有消息
         List<Message> messages = request.prompt().getInstructions();
-        // 遍历找最后一条用户消息（用户最新提问）
-        String userMsg = messages.stream()
-                .filter(m -> m instanceof UserMessage)
-                .map(Message::getText)
-                .reduce((first, last) -> last)
-                .orElse("无用户消息");
 
-        log.info("用户提问：{}", userMsg);
         try {
-            String contextJson = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(request.context());
-            log.info("完整上下文：{}", contextJson);
-        } catch (JsonProcessingException e) {
+            String context=messages.stream().map(m -> String.format("%s消息: %s", m.getMessageType(), m.getText())).collect(Collectors.joining("\n"));
+            log.info("===========完整上下文===========\n{}", context);
+        } catch (Exception e) {
             log.info("完整上下文：加载失败");
         }
     }

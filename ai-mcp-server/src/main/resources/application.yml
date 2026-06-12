@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: ai-mcp-server
+  profiles:
+#    active: sse
+    active: stdio
+server:
+  port: 8081
+
+custom:
+  photo-search:
+    #  https://www.pexels.com/api/documentation/#photos-search 获取key
+    api-key: ${PHOTO_SEARCH_API_KEY}
+    #    // Pexels 常规搜索接口（请以文档为准）
+    api-url: https://api.pexels.com/v1/search
+
+logging:
+  file:
+    name: ./logs/ai-mcp-server.log
+  level:
+    root: info

@@ -239,8 +239,8 @@ public class ForLove {
                 .user(message)
                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
                 .toolCallbacks(toolCallbackProvider)//或者tool(toolCallbackProvider)
-                //与mcp间传递参数，不会经过大模型
-                .toolContext(Map.of("page","1","per_page","5"))
+                //与mcp间传递参数，不会经过大模型  当前版本不生效
+//                .toolContext(Map.of("page","1","per_page","5"))
                 .call()
                 .chatResponse();
         return chatResponse.getResult().getOutput().getText();

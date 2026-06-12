@@ -4,6 +4,10 @@ import cn.hutool.core.util.StrUtil;
 import cn.hutool.http.HttpUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import lombok.extern.slf4j.Slf4j;
+import org.springaicommunity.mcp.annotation.McpMeta;
+import org.springaicommunity.mcp.annotation.McpTool;
+import org.springaicommunity.mcp.context.McpSyncRequestContext;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -16,6 +20,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class ImageSearchTool {
 
     @Value("${custom.photo-search.api-key}")
@@ -28,10 +33,9 @@ public class ImageSearchTool {
     @Tool(description = "search image from web")
     public String searchImage(
             @ToolParam(description = "Search query keyword") String query
-            , ToolContext toolContext
             ) {
         try {
-            return String.join("\n", searchMediumImages(query,toolContext));
+            return String.join("\n", searchMediumImages(query));
         } catch (Exception e) {
             return "Error search image: " + e.getMessage();
         }
@@ -43,16 +47,14 @@ public class ImageSearchTool {
      * @param query
      * @return
      */
-    public List<String> searchMediumImages(String query, ToolContext toolContext) {
-        // 从上下文里取出客户端传递的所有参数
-        String page = (String) toolContext.getContext().get("page");
-        String perPage = (String) toolContext.getContext().get("per_page");
+    public List<String> searchMediumImages(String query) {
         // 设置请求头（包含API密钥）
         Map<String, String> headers = new HashMap<>();
         headers.put("Authorization", apiKey);
-        headers.put("page", page);
-        headers.put("per_page", perPage);
-
+        headers.put("page", System.getenv("page"));
+        headers.put("per_page", System.getenv("per_page"));
+        log.info("page: " + System.getenv("page"));
+        log.info("per_page: " + System.getenv("per_page"));
         // 设置请求参数（仅包含query，可根据文档补充page、per_page等参数）
         Map<String, Object> params = new HashMap<>();
         params.put("query", query);

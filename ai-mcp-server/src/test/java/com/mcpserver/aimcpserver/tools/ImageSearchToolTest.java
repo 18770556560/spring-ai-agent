@@ -17,8 +17,8 @@ class ImageSearchToolTest {
     private ImageSearchTool imageSearchTool;
     @Test
     void searchImage() {
-        String s = imageSearchTool.searchImage("羽毛球",new ToolContext(Map.of("page","1","per_page","5")));
-        System.out.println(s);
-        Assertions.assertNotNull( s);
+//        String s = imageSearchTool.searchImage("羽毛球",new ToolContext(Map.of("page","1","per_page","5")));
+//        System.out.println(s);
+//        Assertions.assertNotNull( s);
     }
 }

@@ -20,6 +20,8 @@ public class ImageSdkInvoke {
     static {Constants.baseHttpApiUrl="https://dashscope.aliyuncs.com/api/v1";}
     @Value("${spring.ai.dashscope.api-key}")
     private static String apiKey;
+//    private static final String apiKey = "apikey";
+//    private static final String model = "apikey";
 
     public static void simpleMultiModalConversationCall()
             throws ApiException, NoApiKeyException, UploadFileException {

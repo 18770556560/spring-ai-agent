@@ -48,8 +48,10 @@ public class AiTools {
         }
     }
 
-
-//    @Tool(description = "read content from a file")
+    /**
+     * 读本地文件
+     */
+    @Tool(description = "read content from a file")
     public String readFile(@ToolParam(description = "name of the file") String fileName) {
         String filePath = AiConstant.FILE_SAVE_DIR + "/" + fileName;
         try {
@@ -62,7 +64,7 @@ public class AiTools {
     /**
      * 秘塔搜索
      */
-    /*@Tool(name = "webSearch",description = "search for information from Metaso search engine")
+//    @Tool(name = "webSearch",description = "search for information from Metaso search engine")
     public String webSearch(@ToolParam(description = "key words of search query") String query) {
         try {
             MetasoService.Response response = metasoService.apply(MetasoService.Request.simplyQuery(query));
@@ -77,7 +79,7 @@ public class AiTools {
             log.error("metaso搜索失败: ", e.getMessage());
             return "搜索失败：" + e.getMessage();
         }
-    }*/
+    }
 
     /**
      * 百度搜索
@@ -99,6 +101,10 @@ public class AiTools {
         }
     }
 
+
+    /**
+     * 天气查询
+     */
     @Tool(name = "weatherSearch",description = "search for weather")
     public WeatherService.Response weatherSearch(@ToolParam(description = "THE CITY OF INQUIRY") String city,@ToolParam(description = "The number of days for which the weather is forecasted",required = false) int day) {
         try {
@@ -110,6 +116,9 @@ public class AiTools {
         }
     }
 
+    /**
+     * 生成PDF文件
+     **/
     @Tool(description = "Generate a PDF file with given content",returnDirect = true)
     public String generatePDF(
             @ToolParam(description = "Name of the file to save the generated PDF") String fileName,
