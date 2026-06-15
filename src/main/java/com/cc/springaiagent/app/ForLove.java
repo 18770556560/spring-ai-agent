@@ -25,6 +25,7 @@ import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
+import reactor.core.publisher.Flux;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -42,7 +43,12 @@ public class ForLove {
     @Value("classpath:/prompts/system-message.st")
     private org.springframework.core.io.Resource systemResource;
 
-    String systemPrompt = "扮演深耕恋爱心理领域的专家。开场向用户表明身份，告知用户可倾诉恋爱难题。围绕单身、恋爱、已婚三种状态提问：单身状态询问社交圈拓展及追求心仪对象的困扰；恋爱状态询问沟通、习惯差异引发的矛盾；已婚状态询问家庭责任与亲属关系处理的问题。引导用户详述事情经过、对方反应及自身想法，以便给出专属解决方案。\n";
+    String systemPrompt = "你是污染防控智能问答助手，核心依托已入库的污染防控知识库进行回复。\n" +
+            "1. 仅基于知识库内的问题、成因、应对措施、标准规范、问答内容响应提问，禁止拓展知识库以外的专业知识。\n" +
+            "2. 用户提问对应到知识库某条内容时，完整提炼核心信息作答，逻辑清晰、重点突出。\n" +
+            "3. 区分污染类型（大气、水、土壤、固废、噪声），精准匹配场景给出解决方案。\n" +
+            "4. 遇到超出知识库范围的问题，统一回复：“当前暂无该问题的相关解答，请您咨询环保专业人员。”\n" +
+            "5. 表述口语化、实操性强，避免晦涩专业术语堆砌，方便现场人员理解使用。\n";
 //    String systemPrompt="你是恋爱心理顾问，先自我介绍，引导用户按【单身/恋爱/已婚】分类倾诉：\n" +
 //        "1.单身：交友、追人难题\n" +
 //        "2.恋爱：沟通、习惯矛盾\n" +
@@ -50,13 +56,17 @@ public class ForLove {
 //        "让用户细说事件、对方反应、自身想法，定制方案。";
     /**
      * 初始化客户端
+     *
      */
     public ForLove(ChatModel chatModel, ChatMemory databaseChatMemory) {
+        //内部存储会话记忆
         ChatMemory chatMemory = MessageWindowChatMemory.builder().maxMessages(3).build();
+        //文件存储会话记忆
 //        String fileDir=System.getProperty("user.dir")+"/chat-memory";
 //        ChatMemory chatMemory = new FileBasedChatMemory(fileDir);
+
         this.chatClient = ChatClient.builder(chatModel)
-//                .defaultSystem(systemPrompt)
+                .defaultSystem(systemPrompt)
 //                .defaultTools()
                 .defaultAdvisors(//默认顾问  每次对话时，会自动调用
 //                        MessageChatMemoryAdvisor.builder(databaseChatMemory).build(),//数据库存储会话记忆
@@ -77,7 +87,7 @@ public class ForLove {
         ChatResponse chatResponse = chatClient.prompt()
                 .user(content)
                 .advisors(a -> a
-                        .param("chat_memory_conversation_id", chatId)
+                        .param(ChatMemory.CONVERSATION_ID, chatId)
                 )
                 .call().chatResponse();
         return chatResponse.getResult().getOutput().getText();
@@ -106,7 +116,7 @@ public class ForLove {
                         DashScopeChatOptions.builder().model("qwen3.7-plus").multiModel(true).build()))
                 .system(sysContent)
                 .advisors(a -> a
-                        .param("chat_memory_conversation_id", chatId)
+                        .param(ChatMemory.CONVERSATION_ID, chatId)
                 )
                 .call()
                 .chatResponse();
@@ -126,7 +136,7 @@ public class ForLove {
                 .system(systemPrompt + "每次对话后都要生成恋爱结果，标题为{用户名}的恋爱报告，内容为建议列表")
                 .user(message)
                 .advisors(spec -> spec
-                        .param("chat_memory_conversation_id", chatId))
+                        .param(ChatMemory.CONVERSATION_ID, chatId))
                 .call()
                 .entity(LoveReport.class);
         log.info("loveReport: {}", loveReport);
@@ -151,6 +161,9 @@ public class ForLove {
     }
 
 
+    /**
+     * 使用内部存储的知识库
+     */
     @Resource
     private VectorStore loveAppVectorStore;
 
@@ -176,7 +189,7 @@ public class ForLove {
         return chatResponse.getResult().getOutput().getText();
     }
 
-    //本地知识库
+    //使用本地pg存储的知识库
     @Resource
     private VectorStore pgVectorVectorStore;
 
@@ -202,7 +215,35 @@ public class ForLove {
         return chatResponse.getResult().getOutput().getText();
     }
 
+    /**
+     * 支持多轮对话记忆，SSE 流式传输,本地知识库
+     */
+    public Flux<String> doChatLocalRagStream(String message, String chatId) {
+        Flux<String> content = chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .advisors(
+                        QuestionAnswerAdvisor
+                                .builder(pgVectorVectorStore)
+                                // 配置SearchRequest：召回条数、相似度阈值
+                                .searchRequest(SearchRequest.builder()
+                                        .topK(4) // 召回4条文档，自定义
+                                        .similarityThreshold(0.3d) // 相似度过滤
+                                        .build())
+                                // 可选：自定义RAG提示模板，默认自带 {question_answer_context}占位符
+                                // .userTextAdvise("根据上下文：{question_answer_context}回答用户问题：{query}")
+                                .build()
+                )
+                .stream()
+                .content();
+        return content;
+    }
 
+
+    /**
+     * 使用完整优化流程--rag模块化
+     */
     @Resource
     private Advisor fullRetrievalAugmentationAdvisor;
     public String doChatWithfullRag(String message, String chatId) {
@@ -218,6 +259,10 @@ public class ForLove {
         return chatResponse.getResult().getOutput().getText();
     }
 
+
+    /**
+     * 使用工具
+     */
     @Resource
     AiTools aiTools;
     public String doChatWithTools(String message, String chatId) {

@@ -2,10 +2,8 @@ package com.cc.springaiagent.rag;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.document.Document;
-import org.springframework.ai.reader.JsonReader;
 import org.springframework.ai.reader.markdown.MarkdownDocumentReader;
 import org.springframework.ai.reader.markdown.config.MarkdownDocumentReaderConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
@@ -50,7 +48,8 @@ public class LoveAppDocumentLoader {
         List<Document> allDocuments = new ArrayList<>();
         try {
             // 获取 classpath:document/ 目录下所有 .md 文件
-            Resource[] resources = resourcePatternResolver.getResources("classpath:document/*.md");
+//            Resource[] resources = resourcePatternResolver.getResources("classpath:document/*.md");
+            Resource[] resources = resourcePatternResolver.getResources("classpath:document/污染防控*.md");
 //            Resource[] resources = resourcePatternResolver.getResources("classpath:document/单身人员册.md");
             // 获取 classpath:document/ 目录下所有 .json 文件
 //            Resource[] resources = resourcePatternResolver.getResources("classpath:document/*.json");
@@ -72,15 +71,15 @@ public class LoveAppDocumentLoader {
 
                 // 创建阅读器并执行解析
                 MarkdownDocumentReader markdownDocumentReader = new MarkdownDocumentReader(resource, config);
-                //创建JSON阅读器
-                JsonReader jsonReader = new JsonReader(resource);
-
                 allDocuments.addAll(markdownDocumentReader.get());
+
+                //创建JSON阅读器（读取json格式知识库数据文件）
+//                JsonReader jsonReader = new JsonReader(resource);
 //                allDocuments.addAll(jsonReader.get());
             }
         } catch (IOException e) {
-            log.error("Json 文档加载失败", e);
-//            log.error("Markdown 文档加载失败", e);
+//            log.error("Json 文档加载失败", e);
+            log.error("Markdown 文档加载失败", e);
         }
         return allDocuments;
     }

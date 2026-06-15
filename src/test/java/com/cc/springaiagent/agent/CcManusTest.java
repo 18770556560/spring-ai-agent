@@ -14,6 +14,8 @@ class CcManusTest {
     void test() {
         String userInput = "北京天气怎么样，最近有什么相关新闻吗，整理为有结构层次的内容并生成pdf报告";
         String result = ccManus.run(userInput);
+        System.out.println("============================");
+        System.out.println( result);
         Assertions.assertNotNull( result);
     }
 

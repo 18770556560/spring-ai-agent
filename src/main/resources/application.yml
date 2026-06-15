@@ -1,7 +1,7 @@
 # Spring 应用基本配置
 spring:
   profiles:
-    active: loc
+    active: {SPRING_PROFILE_ACTIVE}
   application:
     # 应用名称，用于服务注册与发现或日志标识
     name: spring-ai-agent

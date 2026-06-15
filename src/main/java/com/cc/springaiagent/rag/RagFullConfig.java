@@ -3,12 +3,10 @@ package com.cc.springaiagent.rag;
 
 import com.alibaba.cloud.ai.advisor.RetrievalRerankAdvisor;
 import com.alibaba.cloud.ai.model.RerankModel;
-import dev.langchain4j.agent.tool.P;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.PromptTemplate;
-import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
 import org.springframework.ai.rag.generation.augmentation.ContextualQueryAugmenter;
 import org.springframework.ai.rag.generation.augmentation.QueryAugmenter;
@@ -18,7 +16,6 @@ import org.springframework.ai.rag.preretrieval.query.transformation.TranslationQ
 import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -106,8 +103,8 @@ public class RagFullConfig {
         return RetrievalAugmentationAdvisor.builder()
                 // 预检索：Query 改写
                 .queryTransformers(myTranslationQueryTransformer)//翻译
-//                .queryTransformers(myRewriteQueryTransformer)//重写
-                .queryTransformers(queryRewriter)//重写
+//                .queryTransformers(myRewriteQueryTransformer)//框架重写器
+                .queryTransformers(queryRewriter)//自定义重写器
                 // 检索：向量检索
                 .documentRetriever(documentRetriever)
                 // 后检索：去重 + 重排序

@@ -90,7 +90,7 @@ public class ToolCallAgent extends ReactAgent {
         try {
             //根据ai工具调用请求执行调用
             ToolExecutionResult toolExecutionResult = this.toolCallingManager
-                    .executeToolCalls(new Prompt(this.getMessageList()), this.toolCallResponse);
+                    .executeToolCalls(new Prompt(this.getMessageList(),this.chatOptions), this.toolCallResponse);
             //conversationHistory中包含了历史会话消息
             this.setMessageList(toolExecutionResult.conversationHistory());
             ToolResponseMessage toolResponseMessage = (ToolResponseMessage) toolExecutionResult.conversationHistory().getLast();
@@ -98,13 +98,14 @@ public class ToolCallAgent extends ReactAgent {
                     .map(response -> String.format("调用工具【%s】====结果【%s】", response.name(), response.responseData()))
                     .collect(Collectors.joining("\n"));
             log.info(executeToolsLog);
-            boolean ifTerminate = toolResponseMessage.getResponses().stream().anyMatch(response -> response.name().equals("do_terminate"));
+            boolean ifTerminate = toolResponseMessage.getResponses().stream()
+                    .anyMatch(response -> response.name().equals("do_terminate"));
             if(ifTerminate){
                 setStatus(AgentStatus.COMPLETED);
             }
 
             //将消息列表最后一个作为结果返回
-            return this.getMessageList().getLast().getText();
+            return executeToolsLog;
         } catch (Exception e) {
             throw new RuntimeException(String.format("Act error:【%s】", e.getMessage()));
         }

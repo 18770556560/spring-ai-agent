@@ -14,6 +14,7 @@ import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -23,7 +24,7 @@ import java.util.List;
 import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgDistanceType.COSINE_DISTANCE;
 import static org.springframework.ai.vectorstore.pgvector.PgVectorStore.PgIndexType.HNSW;
 
-//@Configuration
+@Configuration
 // 扫描 PG 向量 Mapper
 @MapperScan(basePackages = "com.cc.springaiagent.mapper.vector",
         sqlSessionFactoryRef = "pgSqlSessionFactory")
@@ -70,25 +71,44 @@ public class PgDataSourceConfig {
                 .maxDocumentBatchSize(10000)         // Optional: defaults to 10000
                 .build();
         try {
-            //清空表
-            Integer count = jdbcTemplate.queryForObject(
+            Integer isExist = jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name = 'vector_store'",
                     Integer.class
             );
-            if (count > 0) {
-                jdbcTemplate.execute("TRUNCATE TABLE public.vector_store");
+            if(isExist == 0){//表不存在
+                storeData(vectorStore);
+            }else{//表存在
+                // 1. 判断知识库表中是否有数据
+                Long count = jdbcTemplate.queryForObject(
+                        "SELECT COUNT(*) FROM public.vector_store",
+                        Long.class);
+
+                // 如果大于 0，则跳过加载
+                if (count > 0) {//有数据
+                    //清空表再重新加载存储
+//                jdbcTemplate.execute("TRUNCATE TABLE public.vector_store");
+                }else{//无数据
+                    storeData(vectorStore);
+                }
             }
 
-            List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
-            int batchSize = 10;
-            for (int i = 0; i < documents.size(); i += batchSize) {
-                int end = Math.min(i + batchSize, documents.size());
-                List<Document> batch = documents.subList(i, end);
-                vectorStore.add(batch);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return vectorStore;
+    }
+
+    private void storeData(VectorStore vectorStore) {
+        //表不存在或无数据 则重新加载
+        List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
+
+        //token分词
+//                documents=myTokenTextSplitter.splitDocuments( documents);
+        int batchSize = 10;
+        for (int i = 0; i < documents.size(); i += batchSize) {
+            int end = Math.min(i + batchSize, documents.size());
+            List<Document> batch = documents.subList(i, end);
+            vectorStore.add(batch);
+        }
     }
 }
