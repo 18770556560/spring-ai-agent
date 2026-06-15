@@ -1,0 +1,81 @@
+/* 知识助手 - 生态绿色主题 */
+.theme-knowledge {
+  --app-bg: linear-gradient(145deg, #ecfdf5 0%, #d1fae5 35%, #f0fdf4 70%, #ecfccb 100%);
+  --header-bg: rgba(255, 255, 255, 0.72);
+  --header-border: rgba(16, 185, 129, 0.18);
+  --header-shadow: 0 4px 24px rgba(16, 185, 129, 0.1);
+  --accent: #059669;
+  --accent-light: #10b981;
+  --accent-soft: rgba(16, 185, 129, 0.12);
+  --accent-glow: rgba(16, 185, 129, 0.35);
+  --text-primary: #064e3b;
+  --text-secondary: #047857;
+  --text-muted: #6b7280;
+  --chat-bg: rgba(255, 255, 255, 0.55);
+  --chat-border: rgba(16, 185, 129, 0.15);
+  --user-bubble-bg: linear-gradient(135deg, #059669, #10b981);
+  --user-bubble-text: #ffffff;
+  --ai-bubble-bg: rgba(255, 255, 255, 0.92);
+  --ai-bubble-border: rgba(16, 185, 129, 0.2);
+  --ai-bubble-text: #064e3b;
+  --input-bg: rgba(255, 255, 255, 0.88);
+  --input-border: rgba(16, 185, 129, 0.25);
+  --input-focus: rgba(16, 185, 129, 0.45);
+  --btn-bg: linear-gradient(135deg, #059669, #34d399);
+  --btn-shadow: 0 4px 16px rgba(16, 185, 129, 0.35);
+  --avatar-ai-bg: linear-gradient(135deg, #059669, #6ee7b7);
+  --avatar-user-bg: linear-gradient(135deg, #047857, #10b981);
+  --footer-bg: rgba(255, 255, 255, 0.6);
+  --footer-text: #047857;
+  --badge-bg: rgba(16, 185, 129, 0.15);
+  --badge-text: #047857;
+  --error-bg: rgba(239, 68, 68, 0.1);
+  --error-border: rgba(239, 68, 68, 0.3);
+  --error-text: #b91c1c;
+  --complete-bg: rgba(59, 130, 246, 0.1);
+  --complete-border: rgba(59, 130, 246, 0.25);
+  --complete-text: #1d4ed8;
+  --orb-color-1: rgba(16, 185, 129, 0.25);
+  --orb-color-2: rgba(52, 211, 153, 0.2);
+}
+
+/* 超级助手 - 科技紫蓝主题 */
+.theme-manus {
+  --app-bg: linear-gradient(160deg, #0f0c29 0%, #1a1a3e 40%, #24243e 70%, #302b63 100%);
+  --header-bg: rgba(15, 12, 41, 0.75);
+  --header-border: rgba(139, 92, 246, 0.25);
+  --header-shadow: 0 4px 32px rgba(99, 102, 241, 0.2);
+  --accent: #8b5cf6;
+  --accent-light: #a78bfa;
+  --accent-soft: rgba(139, 92, 246, 0.15);
+  --accent-glow: rgba(139, 92, 246, 0.5);
+  --text-primary: #e0e7ff;
+  --text-secondary: #c4b5fd;
+  --text-muted: #94a3b8;
+  --chat-bg: rgba(30, 27, 75, 0.55);
+  --chat-border: rgba(139, 92, 246, 0.2);
+  --user-bubble-bg: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --user-bubble-text: #ffffff;
+  --ai-bubble-bg: rgba(30, 27, 75, 0.85);
+  --ai-bubble-border: rgba(139, 92, 246, 0.35);
+  --ai-bubble-text: #e0e7ff;
+  --input-bg: rgba(15, 12, 41, 0.8);
+  --input-border: rgba(139, 92, 246, 0.35);
+  --input-focus: rgba(139, 92, 246, 0.6);
+  --btn-bg: linear-gradient(135deg, #6366f1, #a855f7);
+  --btn-shadow: 0 4px 20px rgba(139, 92, 246, 0.45);
+  --avatar-ai-bg: linear-gradient(135deg, #6366f1, #ec4899);
+  --avatar-user-bg: linear-gradient(135deg, #4f46e5, #7c3aed);
+  --footer-bg: rgba(15, 12, 41, 0.85);
+  --footer-text: #94a3b8;
+  --badge-bg: rgba(139, 92, 246, 0.2);
+  --badge-text: #c4b5fd;
+  --error-bg: rgba(239, 68, 68, 0.15);
+  --error-border: rgba(248, 113, 113, 0.35);
+  --error-text: #fca5a5;
+  --complete-bg: rgba(34, 211, 238, 0.12);
+  --complete-border: rgba(34, 211, 238, 0.3);
+  --complete-text: #67e8f9;
+  --orb-color-1: rgba(99, 102, 241, 0.3);
+  --orb-color-2: rgba(168, 85, 247, 0.25);
+}
