@@ -69,8 +69,8 @@ public class ForLove {
                 .defaultSystem(systemPrompt)
 //                .defaultTools()
                 .defaultAdvisors(//默认顾问  每次对话时，会自动调用
-//                        MessageChatMemoryAdvisor.builder(databaseChatMemory).build(),//数据库存储会话记忆
-                        MessageChatMemoryAdvisor.builder(chatMemory).build(),//本地存储会话记忆
+                        MessageChatMemoryAdvisor.builder(databaseChatMemory).build(),//数据库存储会话记忆
+//                        MessageChatMemoryAdvisor.builder(chatMemory).build(),//本地存储会话记忆
                         MyLoggerAdvisor.builder().build()
                         //自定义检查顾问
 //                        ,new CheckAdvisor()
@@ -91,6 +91,19 @@ public class ForLove {
                 )
                 .call().chatResponse();
         return chatResponse.getResult().getOutput().getText();
+    }
+
+    /**
+     * 支持多轮对话记忆，SSE 流式传输,本地知识库
+     */
+    public Flux<String> doChatStream(String message, String chatId) {
+        Flux<String> content = chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .stream()
+                .content();
+        return content;
     }
 
     /**

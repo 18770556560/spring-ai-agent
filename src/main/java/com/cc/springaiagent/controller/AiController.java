@@ -43,7 +43,8 @@ public class AiController {
      */
     @GetMapping(value = "/for_love/chat/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<String> doChatLocalRagSSE(String message, String chatId) {
-        return forLove.doChatLocalRagStream(message, chatId);
+//        return forLove.doChatLocalRagStream(message, chatId);
+        return forLove.doChatStream(message, chatId);
     }
 
     /**

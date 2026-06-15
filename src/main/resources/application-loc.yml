@@ -69,16 +69,16 @@ spring:
       # serverTimezone=Asia/Shanghai: 设置时区，避免时间错误
       # allowPublicKeyRetrieval=true: 允许公钥检索(解决某些连接认证问题)
 #      url: jdbc:mysql://localhost:3306/spring_ai_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
-      jdbc-url: jdbc:mysql://localhost:3306/spring_ai_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
+      jdbc-url: jdbc:mysql://${MYSQL_ADDRESS}/spring_ai_agent?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       # 3. 数据库用户名
-      username: root
+      username: ${MYSQL_USERNAME}
       # 4. 数据库密码
-      password: root
-    postgres:
-      jdbc-url: jdbc:postgresql://localhost:5432/postgres?useSSL=false
-      username: postgres
-      password: postgres
-      driver-class-name: org.postgresql.Driver
+      password: ${MYSQL_PASSWORD}
+#    postgres:
+#      jdbc-url: jdbc:postgresql://localhost:5432/postgres?useSSL=false
+#      username: postgres
+#      password: postgres
+#      driver-class-name: org.postgresql.Driver
 
 # 关闭 Spring 自动数据源配置（关键）
 autoconfigure:
