@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
  * 3. 使用 Reciprocal Rank Fusion (RRF) 融合两路结果
  * 4. 返回 TopK 文档
  * <p>
- * 适配 ES 9.x (elasticsearch-java 9.4.2) + Spring AI 1.1.2。
  */
 @Slf4j
 @Component
@@ -82,7 +81,7 @@ public class HybridSearchDocumentRetriever implements DocumentRetriever {
             // 5. 相似度阈值过滤 + 截取 TopK
             List<Document> topDocs = fusedDocs.stream()
                     .filter(doc -> {
-                        Double rrfScore = (Double) doc.getMetadata().get("rrf_score");
+                        Double rrfScore = (Double) doc.getMetadata().get("es_score");
                         return rrfScore != null && rrfScore >= similarityThreshold;
                     })
                     .limit(topK)
@@ -100,7 +99,7 @@ public class HybridSearchDocumentRetriever implements DocumentRetriever {
     // ==================== kNN 向量检索 ====================
 
     /**
-     * ES 9.x: 使用 KnnSearch（非 KnnQuery）作为 kNN 检索入口
+     * 使用 KnnSearch（非 KnnQuery）作为 kNN 检索入口
      */
     private List<ScoredDoc> executeKnnSearch(float[] queryEmbedding) throws Exception {
         List<Float> vectorList = embeddingToFloatList(queryEmbedding);
@@ -113,7 +112,6 @@ public class HybridSearchDocumentRetriever implements DocumentRetriever {
                         .k(topK)
                         .numCandidates(numCandidates)
                 )))
-                // ES 9.x: SourceConfig 使用 filter(SourceFilter) 替代直接的 includes/excludes
                 .source(src -> src.filter(f -> f.includes(List.of("id", "content", "metadata"))))
         );
 

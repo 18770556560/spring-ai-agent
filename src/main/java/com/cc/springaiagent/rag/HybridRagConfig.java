@@ -92,9 +92,13 @@ public class HybridRagConfig {
      */
     @Bean
     public Advisor fullHybridRetrievalAugmentationAdvisor(
+            //查询翻译
 //            TranslationQueryTransformer hybridTranslationQueryTransformer,
+            //查询重写
             RewriteQueryTransformer hybridRewriteQueryTransformer,
+            // 检索：ES 混合检索（kNN 向量 + BM25 文本 + RRF 融合）
             HybridSearchDocumentRetriever hybridSearchDocumentRetriever,
+            // 生成：上下文增强
             QueryAugmenter hybridQueryAugmenter) {
 
         return RetrievalAugmentationAdvisor.builder()

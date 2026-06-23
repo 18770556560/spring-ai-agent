@@ -107,8 +107,6 @@ class ForLoveTest {
         String message = "异常";
         String answer = forLove.doChatWithHybridRag(message, chatId);
         Assertions.assertNotNull(answer);
-        System.out.println("=== ES 混合检索结果 ===");
-        System.out.println(answer);
     }
 
     @Test

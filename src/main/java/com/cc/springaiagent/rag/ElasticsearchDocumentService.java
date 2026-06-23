@@ -1,6 +1,7 @@
 package com.cc.springaiagent.rag;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch._types.mapping.DenseVectorSimilarity;
 import co.elastic.clients.elasticsearch.core.BulkRequest;
 import co.elastic.clients.elasticsearch.core.BulkResponse;
 import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
@@ -22,7 +23,6 @@ import java.util.*;
  * 负责：创建索引、加载知识库 Markdown 文档、向量化、存入 ES。
  * 启动时自动检查索引是否存在，若不存在则创建并导入数据。
  * <p>
- * 适配 ES 9.x (elasticsearch-java 9.4.2) + Spring AI 1.1.2。
  */
 @Slf4j
 @Service
@@ -76,6 +76,8 @@ public class ElasticsearchDocumentService {
      * 创建 ES 索引（定义 mapping）
      * <p>
      * ES 9.x: dense_vector 使用 dims + index，similarity 可选。
+     *
+     * @throws Exception 当索引创建请求执行失败时抛出异常
      */
     private void createIndex() throws Exception {
         CreateIndexRequest request = CreateIndexRequest.of(c -> c
@@ -98,8 +100,7 @@ public class ElasticsearchDocumentService {
                                 .denseVector(dv -> dv
                                         .dims(1024)
                                         .index(true)
-                                        // ES 9.x: similarity() 可用，默认 cosine
-                                        // .similarity(DenseVectorSimilarity.Cosine)
+                                        .similarity(DenseVectorSimilarity.Cosine)
                                 )
                         )
                         .properties("metadata", p -> p
@@ -117,6 +118,9 @@ public class ElasticsearchDocumentService {
 
     /**
      * 批量索引文档（分批，每批 10 条）
+     *
+     * @param documents 待索引的文档列表，包含文本内容及元数据
+     * @throws Exception 当批量写入 ES 发生错误时抛出异常
      */
     public void indexDocuments(List<Document> documents) throws Exception {
         int batchSize = 10;
@@ -171,6 +175,8 @@ public class ElasticsearchDocumentService {
 
     /**
      * 清空并重建索引（用于知识库更新）
+     *
+     * @throws Exception 当删除旧索引、创建新索引或重新导入数据过程中发生错误时抛出异常
      */
     public void rebuildIndex() throws Exception {
         ExistsRequest existsRequest = ExistsRequest.of(e -> e.index(indexName));
