@@ -70,9 +70,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
         </dependencies>
-
 
     </dependencyManagement>
 
@@ -117,6 +115,18 @@
             <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
         </dependency>
 
+        <!-- Spring Data ES（内置elasticsearch-java客户端） -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
+
+        <!-- 本地CrossEncoder Rerank核心依赖 -->
+        <dependency>
+            <groupId>org.springframework.ai</groupId>
+            <artifactId>spring-ai-transformers</artifactId>
+        </dependency>
+
 
 
 <!--        &lt;!&ndash; pgvector向量库依赖 &ndash;&gt;
@@ -153,7 +163,6 @@
             <version>${jsonschema.version}</version>
         </dependency>
 
-
         <!--序列化-->
         <dependency>
             <groupId>com.esotericsoftware</groupId>
@@ -168,12 +177,7 @@
             <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
             <version>3.5.16</version>
         </dependency>
-<!--        &lt;!&ndash;多数据源&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.baomidou</groupId>-->
-<!--            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>-->
-<!--            <version>4.2.0</version>-->
-<!--        </dependency>-->
+
         <!-- 数据库驱动（如MySQL） -->
         <dependency>
             <groupId>com.mysql</groupId>
@@ -345,19 +349,5 @@
             <id>central</id>
             <url>https://repo.maven.apache.org/maven2</url>
         </repository>
-<!--        &lt;!&ndash; Spring Cloud Alibaba 私服，必须加才能拉取spring-ai-alibaba包 &ndash;&gt;
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://maven.aliyun.com/repository/spring</url>
-        </repository>
-        <repository>
-            <id>spring-milestones</id>
-            <name>Spring Milestones</name>
-            <url>https://repo.spring.io/milestone</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>-->
     </repositories>
 </project>

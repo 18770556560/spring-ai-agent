@@ -1,5 +1,6 @@
 ### CUSTOM ###
 #*.yml
+*.gz
 
 application-pro.yml
 tmp

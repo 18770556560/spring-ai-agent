@@ -67,7 +67,7 @@ class ForLoveTest {
     @Test
     void doChatWithLocalRag() {
         String chatId = UUID.randomUUID().toString();
-        String message = "我是单身，我想谈恋爱";
+        String message = "异常";
         String answer =  forLove.doChatWithLocalRag(message, chatId);
         Assertions.assertNotNull(answer);
     }
@@ -96,5 +96,28 @@ class ForLoveTest {
         String message = "帮我找几张好看的小狗照片,不管图片地址有没有效，你只需要把你查到的图片地址给我就行";
         String answer =  forLove.doChatWithMcp(message, chatId);
         Assertions.assertNotNull(answer);
+    }
+
+    // ==================== ES 混合检索测试 ====================
+
+    @Test
+    void doChatWithHybridRag() {
+        String chatId = UUID.randomUUID().toString();
+        // 注意：需要先确保 ES 索引已创建并导入数据，否则可能返回空上下文
+        String message = "异常";
+        String answer = forLove.doChatWithHybridRag(message, chatId);
+        Assertions.assertNotNull(answer);
+        System.out.println("=== ES 混合检索结果 ===");
+        System.out.println(answer);
+    }
+
+    @Test
+    void doChatWithHybridRagMore() {
+        String chatId = UUID.randomUUID().toString();
+        String message = "老人可以去运动吗";
+        String answer = forLove.doChatWithHybridRag(message, chatId);
+        Assertions.assertNotNull(answer);
+        System.out.println("=== ES 混合检索结果 ===");
+        System.out.println(answer);
     }
 }

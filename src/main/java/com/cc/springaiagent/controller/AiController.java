@@ -93,4 +93,50 @@ public class AiController {
         CcManus CcManus = new CcManus(allTools, chatModel);
         return CcManus.runStream(message);
     }
+
+    // ==================== ES 混合检索接口 ====================
+
+    /**
+     * 同步：ES 混合检索 RAG（向量 + BM25 + RRF 融合）
+     */
+    @GetMapping("/for_love/chat/hybrid/sync")
+    public String doChatHybridSync(String message, String chatId) {
+        return forLove.doChatWithHybridRag(message, chatId);
+    }
+
+    /**
+     * SSE 流式：ES 混合检索 RAG
+     */
+    @GetMapping(value = "/for_love/chat/hybrid/sse", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> doChatHybridSSE(String message, String chatId) {
+        return forLove.doChatWithHybridRagStream(message, chatId);
+    }
+
+    /**
+     * ServerSentEvent：ES 混合检索 RAG
+     */
+    @GetMapping(value = "/for_love/chat/hybrid/server_sent_event")
+    public Flux<ServerSentEvent<String>> doChatHybridServerSentEvent(String message, String chatId) {
+        return forLove.doChatWithHybridRagStream(message, chatId)
+                .map(chunk -> ServerSentEvent.<String>builder()
+                        .data(chunk)
+                        .build());
+    }
+
+    /**
+     * SseEmitter：ES 混合检索 RAG
+     */
+    @GetMapping(value = "/for_love/chat/hybrid/sse_emitter")
+    public SseEmitter doChatHybridSseEmitter(String message, String chatId) {
+        SseEmitter sseEmitter = new SseEmitter(180000L);
+        forLove.doChatWithHybridRagStream(message, chatId)
+                .subscribe(chunk -> {
+                    try {
+                        sseEmitter.send(chunk);
+                    } catch (IOException e) {
+                        sseEmitter.completeWithError(e);
+                    }
+                }, sseEmitter::completeWithError, sseEmitter::complete);
+        return sseEmitter;
+    }
 }

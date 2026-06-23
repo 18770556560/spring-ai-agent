@@ -55,7 +55,9 @@ spring:
 #            servers1:
 #              url: http://localhost:8081
         annotation-scanner:
-          enabled:  true
+          # 关闭 MCP 注解扫描（避免扫描 SpringDoc Querydsl 类时因缺少依赖而报错）
+          # MCP 工具通过 mcp-servers.json 配置，不依赖注解扫描
+          enabled: false
         request-timeout: 30s
         type: sync
 
@@ -79,6 +81,24 @@ spring:
       username: postgres
       password: postgres
       driver-class-name: org.postgresql.Driver
+
+  elasticsearch:
+    # ES 连接地址（生产环境请修改为实际地址）
+    uris: http://${ES_HOST:localhost}:9200
+    # username: elastic
+    # password: ${ES_PASSWORD}
+    connection-timeout: 10s
+    socket-timeout: 30s
+
+  # ==================== 自定义 ES 混合检索配置 ====================
+  es:
+    hybrid:
+      index-name: knowledge_base
+      similarity-threshold: 0.5
+      top-k: 10
+      num-candidates: 20
+      rank-window-size: 10
+      rank-constant: 60
 
 # 关闭 Spring 自动数据源配置（关键）
 autoconfigure:

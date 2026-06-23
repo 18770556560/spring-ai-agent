@@ -20,14 +20,20 @@ spring:
           model: deepseek-r1:1.5b
           temperature: 0.7
     dashscope:
+      rerank:
+        api-key: ${DASHSCOPE_API_KEY}
+        options:
+          model: qwen3-vl-rerank
       embedding:
         options:
           model: text-embedding-v3
 
       api-key: ${DASHSCOPE_API_KEY}
+#      api-key: sk-ws-H.REMYMMD.nEps.MEQCIHlRzWYx6kji-hLAz20x4IxN6ept6IdkmBCntyqjw6tQAiAmiQga9MdowLVu0DacHzmV0iLmqRcmpJ8NzdviSgEFhA
       chat:
         options:
           model: qwen-plus
+        api-key: ${DASHSCOPE_API_KEY}
 
     vectorstore:
       pgvector:
@@ -55,7 +61,9 @@ spring:
 #            servers1:
 #              url: http://localhost:8081
         annotation-scanner:
-          enabled:  true
+          # 关闭 MCP 注解扫描（避免扫描 SpringDoc Querydsl 类时因缺少依赖而报错）
+          # MCP 工具通过 mcp-servers.json 配置，不依赖注解扫描
+          enabled: false
         request-timeout: 30s
         type: sync
 
@@ -77,8 +85,33 @@ spring:
 #    postgres:
 #      jdbc-url: jdbc:postgresql://localhost:5432/postgres?useSSL=false
 #      username: postgres
-#      password: postgres
+#      password: postgres123
 #      driver-class-name: org.postgresql.Driver
+
+  elasticsearch:
+    # 本地 Docker ES 连接地址
+    uris: http://localhost:9200
+    # ES 8.x 默认安全性：如果本地测试关闭了安全认证，可注释掉 username/password
+    username: elastic
+    password: Es@123456
+    connection-timeout: 10s
+    socket-timeout: 30s
+
+  # ==================== 自定义 ES 混合检索配置 ====================
+  es:
+    hybrid:
+      # ES 索引名称
+      index-name: knowledge_base
+      # 向量相似度阈值
+      similarity-threshold: 0.5
+      # 每次检索返回的最大文档数
+      top-k: 10
+      # kNN 搜索的候选项数（需 > topK）
+      num-candidates: 20
+      # RRF 融合的排名窗口大小
+      rank-window-size: 10
+      # RRF 排名常数（默认 60）
+      rank-constant: 60
 
 # 关闭 Spring 自动数据源配置（关键）
 autoconfigure:

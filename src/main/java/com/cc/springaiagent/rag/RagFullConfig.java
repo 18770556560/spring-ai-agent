@@ -22,6 +22,17 @@ import org.springframework.context.annotation.Configuration;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * 完整 RAG 管线配置 —— 基于 PGVector 向量存储
+ * <p>
+ * 管线流程：
+ * 1. 预检索：Query 翻译 + 重写
+ * 2. 检索：PGVector 向量检索
+ * 3. 后检索：文档去重 + 重排序（精排）
+ * 4. 生成：上下文增强
+ * <p>
+ * 适配 Spring AI 1.1.2。
+ */
 @Configuration
 public class RagFullConfig {
 
@@ -30,32 +41,32 @@ public class RagFullConfig {
     public RewriteQueryTransformer myRewriteQueryTransformer(ChatModel chatModel) {
         return RewriteQueryTransformer.builder()
                 .chatClientBuilder(ChatClient.builder(chatModel))
-//                .promptTemplate(new PromptTemplate("重写问题：{question}"))//可自定义重写模板
+                // .promptTemplate(new PromptTemplate("重写问题：{question}")) // 可自定义重写模板
                 .build();
     }
+
     @Bean
     public TranslationQueryTransformer myTranslationQueryTransformer(ChatModel chatModel) {
-
         return TranslationQueryTransformer.builder()
                 .chatClientBuilder(ChatClient.builder(chatModel))
-                .targetLanguage("中文")//可自定义目标语言
+                .targetLanguage("中文") // 可自定义目标语言
                 .build();
     }
-
 
     // 4. 检索模块：向量检索器（配置相似度阈值、返回数量）
     @Bean
     public VectorStoreDocumentRetriever documentRetriever(VectorStore pgVectorVectorStore) {
         return VectorStoreDocumentRetriever.builder()
                 .vectorStore(pgVectorVectorStore)
-                .similarityThreshold(0.50)  // 相似度阈值，低于该值的文档会被过滤
-                .topK(10)                    // 最多返回 10 条相关文档
-//                .filterExpression(new FilterExpressionBuilder().eq("filename", "单身人员册.md").build())// 可自定义过滤条件
+                .similarityThreshold(0.50) // 相似度阈值，低于该值的文档会被过滤
+                .topK(10)                  // 最多返回 10 条相关文档
+                // .filterExpression(new FilterExpressionBuilder().eq("filename", "单身人员册.md").build()) // 可自定义过滤条件
                 .build();
     }
 
     // 5. 后检索模块：文档去重 + 重排序
-    //去重
+
+    // 去重
     @Bean
     public DocumentPostProcessor myDocumentPostProcessor() {
         // 使用HashSet记录已见过的文档ID，以实现基于ID的去重逻辑
@@ -67,33 +78,35 @@ public class RagFullConfig {
         };
     }
 
-    //重排序（精排）
+    // 重排序（精排）—— 需要直接作为 Advisor 传给 ChatClient 使用
     @Bean
     public RetrievalRerankAdvisor myRetrievalRerankAdvisor(VectorStore pgVectorVectorStore,
-                                                RerankModel rerankModel) {
+                                                           RerankModel rerankModel) {
         return new RetrievalRerankAdvisor(
                 pgVectorVectorStore,
                 rerankModel,
                 SearchRequest.builder()
-                        .topK(5)
+                        .topK(1)
                         .similarityThreshold(0.5)
                         .build());
     }
 
-    // 6. 生成模块：上下文增强器（把检索到的文档拼接到prompt中）
+    // 6. 生成模块：上下文增强器（把检索到的文档拼接到 prompt 中）
     @Bean
     public QueryAugmenter myQueryAugmenter() {
         return ContextualQueryAugmenter.builder()
-                .allowEmptyContext(true)  // 不允许无上下文回答，避免模型瞎编
-                .emptyContextPromptTemplate(new PromptTemplate("你直接回答'我是恋爱专家，只能回答相关问题'"))//可自定义拼接模板
+                .allowEmptyContext(true) // 允许无上下文回答，避免模型瞎编
+                .emptyContextPromptTemplate(new PromptTemplate("你直接回答'我是恋爱专家，只能回答相关问题'")) // 可自定义拼接模板
                 .build();
     }
 
     // 7. 组装全流程 RetrievalAugmentationAdvisor
+    /**
+     * 注意：queryTransformers 是覆盖式设置（非追加），所有 transformer 必须一次传入。
+     */
     @Bean
     public Advisor fullRetrievalAugmentationAdvisor(
             RewriteQueryTransformer myRewriteQueryTransformer,
-            QueryRewriter queryRewriter,
             TranslationQueryTransformer myTranslationQueryTransformer,
             VectorStoreDocumentRetriever documentRetriever,
             DocumentPostProcessor myDocumentPostProcessor,
@@ -101,14 +114,15 @@ public class RagFullConfig {
             QueryAugmenter myQueryAugmenter) {
 
         return RetrievalAugmentationAdvisor.builder()
-                // 预检索：Query 改写
-                .queryTransformers(myTranslationQueryTransformer)//翻译
-//                .queryTransformers(myRewriteQueryTransformer)//框架重写器
-                .queryTransformers(queryRewriter)//自定义重写器
+                // 预检索：翻译 + 重写（需在一次调用中传入所有 transformer）
+                .queryTransformers(
+                        myTranslationQueryTransformer,
+                        myRewriteQueryTransformer
+                )
                 // 检索：向量检索
                 .documentRetriever(documentRetriever)
                 // 后检索：去重 + 重排序
-//                .documentPostProcessors(myDocumentPostProcessor, myRetrievalRerankAdvisor)
+                // .documentPostProcessors(myDocumentPostProcessor, myRetrievalRerankAdvisor)
                 // 生成：上下文增强
                 .queryAugmenter(myQueryAugmenter)
                 .build();

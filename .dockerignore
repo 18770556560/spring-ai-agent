@@ -1,0 +1,28 @@
+# Maven
+target/classes/
+target/generated-sources/
+target/generated-test-sources/
+target/maven-archiver/
+target/maven-status/
+target/test-classes/
+target/*.original
+
+# IDE
+.idea/
+*.iml
+
+# Source (不需要重新编译)
+src/
+pom.xml
+
+# Git
+.git/
+.gitignore
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db

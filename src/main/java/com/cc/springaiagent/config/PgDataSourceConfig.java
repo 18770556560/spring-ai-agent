@@ -102,11 +102,12 @@ public class PgDataSourceConfig {
         List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
 
         //token分词
-//                documents=myTokenTextSplitter.splitDocuments( documents);
+//        documents=myTokenTextSplitter.splitDocuments( documents);
         int batchSize = 10;
         for (int i = 0; i < documents.size(); i += batchSize) {
             int end = Math.min(i + batchSize, documents.size());
             List<Document> batch = documents.subList(i, end);
+            //add方法中包含了embedding过程
             vectorStore.add(batch);
         }
     }

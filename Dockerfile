@@ -1,16 +1,13 @@
-# 使用预装 Maven 和 JDK21 的镜像
-FROM maven:3.9-amazoncorretto-21
+# 使用轻量级 jdk21 JRE 运行镜像（Alpine 版本体积更小）
+FROM eclipse-temurin:21-jre
+
 WORKDIR /app
 
-# 只复制必要的源代码和配置文件
-COPY pom.xml .
-COPY src ./src
-
-# 使用 Maven 执行打包
-RUN mvn clean package -DskipTests
+# 直接复制已构建好的 jar 包（无需重新编译）
+COPY target/spring-ai-agent-0.0.1-SNAPSHOT.jar app.jar
 
 # 暴露应用端口
 EXPOSE 8080
 
-# 使用生产环境配置启动应用
-CMD ["java", "-jar", "/app/target/spring-ai-agent-0.0.1-SNAPSHOT.jar", "--spring.profiles.active=prod"]
+# 启动应用，可通过环境变量覆盖端口
+ENTRYPOINT ["java", "-jar", "app.jar", "--server.port=8080"]

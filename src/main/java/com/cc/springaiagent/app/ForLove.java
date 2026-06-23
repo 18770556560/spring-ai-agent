@@ -1,5 +1,6 @@
 package com.cc.springaiagent.app;
 
+import com.alibaba.cloud.ai.advisor.RetrievalRerankAdvisor;
 import com.alibaba.cloud.ai.dashscope.chat.DashScopeChatOptions;
 import com.alibaba.cloud.ai.dashscope.chat.MessageFormat;
 import com.alibaba.cloud.ai.dashscope.common.DashScopeApiConstants;
@@ -206,22 +207,27 @@ public class ForLove {
     @Resource
     private VectorStore pgVectorVectorStore;
 
+
+    @Resource
+    RetrievalRerankAdvisor myRetrievalRerankAdvisor;
+
     public String doChatWithLocalRag(String message, String chatId) {
         ChatResponse chatResponse = chatClient
                 .prompt()
                 .user(message)
                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
                 .advisors(
-                        QuestionAnswerAdvisor
-                                .builder(pgVectorVectorStore)
-                                // 配置SearchRequest：召回条数、相似度阈值
-                                .searchRequest(SearchRequest.builder()
-                                        .topK(4) // 召回4条文档，自定义
-                                        .similarityThreshold(0.3d) // 相似度过滤
-                                        .build())
-                                // 可选：自定义RAG提示模板，默认自带 {question_answer_context}占位符
-                                // .userTextAdvise("根据上下文：{question_answer_context}回答用户问题：{query}")
-                                .build()
+                        myRetrievalRerankAdvisor
+//                        ,QuestionAnswerAdvisor
+//                                .builder(pgVectorVectorStore)
+//                                // 配置SearchRequest：召回条数、相似度阈值
+//                                .searchRequest(SearchRequest.builder()
+//                                        .topK(10) // 召回4条文档，自定义
+//                                        .similarityThreshold(0.3d) // 相似度过滤
+//                                        .build())
+//                                // 可选：自定义RAG提示模板，默认自带 {question_answer_context}占位符
+//                                // .userTextAdvise("根据上下文：{question_answer_context}回答用户问题：{query}")
+//                                .build()
                 )
                 .call()
                 .chatResponse();
@@ -266,6 +272,7 @@ public class ForLove {
                 .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
                 .advisors(
                         fullRetrievalAugmentationAdvisor//查询重写、检索过滤、重排序、上下文增强
+                        , myRetrievalRerankAdvisor
                 )
                 .call()
                 .chatResponse();
@@ -303,5 +310,60 @@ public class ForLove {
                 .chatResponse();
         return chatResponse.getResult().getOutput().getText();
     }
+
+    // ==================== ES 混合检索方法 ====================
+
+    /**
+     * 使用 ES 混合检索（向量 + BM25 文本 + RRF 融合）的全流程 RAG
+     */
+    @Resource
+    private Advisor fullHybridRetrievalAugmentationAdvisor;
+
+    /**
+     * 同步：ES 混合检索 RAG
+     */
+    public String doChatWithHybridRag(String message, String chatId) {
+        ChatResponse chatResponse = chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .advisors(fullHybridRetrievalAugmentationAdvisor)
+                .call()
+                .chatResponse();
+        return chatResponse.getResult().getOutput().getText();
+    }
+
+    /**
+     * 流式：ES 混合检索 RAG（SSE）
+     */
+    public Flux<String> doChatWithHybridRagStream(String message, String chatId) {
+        Flux<String> content = chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+                .advisors(fullHybridRetrievalAugmentationAdvisor)
+                .stream()
+                .content();
+        return content;
+    }
+
+    // 注意：如需精排，取消下面注释并注入 hybridRetrievalRerankAdvisor
+    // @Resource
+    // private RetrievalRerankAdvisor hybridRetrievalRerankAdvisor;
+    /**
+     * 同步：ES 混合检索 RAG + 精排
+     * <p>
+     * 注意：需要取消 hybridRetrievalRerankAdvisor 字段的注释才能使用
+     */
+//    public String doChatWithHybridRagRerank(String message, String chatId) {
+//        ChatResponse chatResponse = chatClient
+//                .prompt()
+//                .user(message)
+//                .advisors(spec -> spec.param(ChatMemory.CONVERSATION_ID, chatId))
+//                .advisors(fullHybridRetrievalAugmentationAdvisor, hybridRetrievalRerankAdvisor)
+//                .call()
+//                .chatResponse();
+//        return chatResponse.getResult().getOutput().getText();
+//    }
 
 }
