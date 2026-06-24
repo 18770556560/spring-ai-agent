@@ -49,7 +49,8 @@ public class LoveAppDocumentLoader {
         try {
             // 获取 classpath:document/ 目录下所有 .md 文件
 //            Resource[] resources = resourcePatternResolver.getResources("classpath:document/*.md");
-            Resource[] resources = resourcePatternResolver.getResources("classpath:document/污染防控*.md");
+//            Resource[] resources = resourcePatternResolver.getResources("classpath:document/污染防控智能助手-知识库文档.md");
+            Resource[] resources = resourcePatternResolver.getResources("classpath:document/测试.md");
 //            Resource[] resources = resourcePatternResolver.getResources("classpath:document/单身人员册.md");
             // 获取 classpath:document/ 目录下所有 .json 文件
 //            Resource[] resources = resourcePatternResolver.getResources("classpath:document/*.json");

@@ -1,4 +1,22 @@
 spring:
+  rabbitmq:
+    # rabbit 服务地址
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+    # 虚拟主机，默认 /
+    virtual-host: /
+    # 开启消息确认（生产可靠）
+    publisher-confirm-type: correlated
+    publisher-returns: true
+    template:
+      mandatory: true
+    # 消费者手动ACK（推荐，防止消息丢失）
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 10 # 一次预取10条，控制消费并发
   ai:
     alibaba:
       toolcalling:
@@ -112,6 +130,12 @@ spring:
       rank-window-size: 10
       # RRF 排名常数（默认 60）
       rank-constant: 60
+
+  # 文件上传大小限制（文档上传需要较大限制）
+  servlet:
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 60MB
 
 # 关闭 Spring 自动数据源配置（关键）
 autoconfigure:

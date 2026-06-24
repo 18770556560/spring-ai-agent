@@ -27,6 +27,15 @@ const routes = [
       title: 'AI超级智能体 - CCAI超级智能体应用平台',
       description: 'AI超级智能体是CCAI超级智能体应用平台的全能助手，能解答各类专业问题，提供精准建议和解决方案'
     }
+  },
+  {
+    path: '/knowledge-manager',
+    name: 'KnowledgeManager',
+    component: () => import('../views/KnowledgeManager.vue'),
+    meta: {
+      title: '知识库管理 - CCAI超级智能体应用平台',
+      description: '知识库管理 — 上传文档、智能分块、向量索引，为RAG增强检索提供知识基础'
+    }
   }
 ]
 

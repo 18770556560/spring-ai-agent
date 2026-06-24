@@ -54,7 +54,57 @@ export const chatWithManus = (message) => {
   return connectSSE('/ai/manus/chat', { message })
 }
 
+// ==================== 知识库文档管理 API ====================
+
+/**
+ * 上传文档（multipart/form-data）
+ * @param {File} file - 文件对象
+ * @returns {Promise} { success, taskId, fileName, fileSize, status, message }
+ */
+export const uploadDocument = async (file) => {
+  const formData = new FormData()
+  formData.append('file', file)
+  const response = await request.post('/document/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+    timeout: 120000 // 上传超时 2 分钟
+  })
+  return response.data
+}
+
+/**
+ * 查询文档处理状态
+ * @param {string} taskId - 任务ID
+ * @returns {Promise} { success, taskId, fileName, status, chunkCount, errorMsg, createTime, updateTime }
+ */
+export const getDocumentStatus = async (taskId) => {
+  const response = await request.get(`/document/status/${taskId}`)
+  return response.data
+}
+
+/**
+ * 获取文档任务列表
+ * @returns {Promise} { success, total, data: [...] }
+ */
+export const getDocumentList = async () => {
+  const response = await request.get('/document/list')
+  return response.data
+}
+
+/**
+ * 删除文档任务
+ * @param {string} taskId - 任务ID
+ * @returns {Promise} { success, message }
+ */
+export const deleteDocument = async (taskId) => {
+  const response = await request.delete(`/document/${taskId}`)
+  return response.data
+}
+
 export default {
   chatWithLoveApp,
-  chatWithManus
-} 
+  chatWithManus,
+  uploadDocument,
+  getDocumentStatus,
+  getDocumentList,
+  deleteDocument
+}

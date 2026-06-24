@@ -84,12 +84,41 @@
           </div>
         </div>
       </div>
+
+      <!-- 知识库管理 -->
+      <div class="app-card card-kb" @click="navigateTo('/knowledge-manager')">
+        <div class="card-bg-pattern"></div>
+        <div class="card-header-glow"></div>
+        <div class="card-icon-wrapper">
+          <div class="card-icon">📚</div>
+          <div class="icon-ring"></div>
+        </div>
+        <div class="card-body">
+          <h2 class="card-title">知识库管理</h2>
+          <p class="card-desc">异步文档处理 · 向量索引构建</p>
+          <div class="card-tags">
+            <span class="tag">文档上传</span>
+            <span class="tag">智能分块</span>
+            <span class="tag">RabbitMQ</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="card-btn">
+            <span>进入系统</span>
+            <span class="btn-arrow">→</span>
+          </div>
+          <div class="card-status">
+            <span class="status-dot online"></span>
+            <span>运行中</span>
+          </div>
+        </div>
+      </div>
     </main>
 
     <!-- 底部信息条 -->
     <div class="info-bar">
       <div class="info-item">
-        <span class="info-value">2</span>
+        <span class="info-value">3</span>
         <span class="info-label">AI 服务</span>
       </div>
       <div class="info-divider"></div>
@@ -409,6 +438,15 @@ const navigateTo = (path) => {
   --glow-color: #60a5fa;
 }
 
+.card-kb {
+  --glow-color: #8b5cf6;
+  box-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+}
+
+.card-kb:hover {
+  --glow-color: #a78bfa;
+}
+
 .app-card:hover {
   transform: translateY(-8px);
   box-shadow:
@@ -453,6 +491,12 @@ const navigateTo = (path) => {
   background: linear-gradient(135deg, rgba(59, 130, 246, 0.15), rgba(139, 92, 246, 0.1));
   border: 1px solid rgba(59, 130, 246, 0.3);
   box-shadow: 0 8px 24px rgba(59, 130, 246, 0.1);
+}
+
+.card-kb .card-icon {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.15), rgba(168, 85, 247, 0.1));
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.1);
 }
 
 .app-card:hover .card-icon {
@@ -523,6 +567,11 @@ const navigateTo = (path) => {
   color: #93c5fd;
 }
 
+.card-kb .tag {
+  border-color: rgba(139, 92, 246, 0.2);
+  color: #c4b5fd;
+}
+
 .card-footer {
   display: flex;
   align-items: center;
@@ -553,6 +602,11 @@ const navigateTo = (path) => {
 .card-ai .card-btn {
   background: linear-gradient(135deg, #3b82f6, #6366f1);
   box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+}
+
+.card-kb .card-btn {
+  background: linear-gradient(135deg, #7c3aed, #a855f7);
+  box-shadow: 0 4px 16px rgba(139, 92, 246, 0.3);
 }
 
 .card-btn::after {

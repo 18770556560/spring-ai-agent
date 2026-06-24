@@ -92,8 +92,12 @@ public class ElasticsearchDocumentService {
                         .properties("id", p -> p.keyword(k -> k))
                         .properties("content", p -> p
                                 .text(t -> t
-                                        .analyzer("standard")
-                                        .searchAnalyzer("standard")
+//                                        .analyzer("standard")
+//                                        .searchAnalyzer("standard")
+                                        //中文必须使用ik分词器
+                                        .analyzer("ik_max_word")
+                                        .searchAnalyzer("ik_smart")
+//                                        .termVector(TermVectorOption.Yes)//高亮
                                 )
                         )
                         .properties("embedding", p -> p
