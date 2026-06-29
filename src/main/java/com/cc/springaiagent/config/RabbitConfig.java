@@ -40,7 +40,7 @@ public class RabbitConfig {
 
     // ==================== Agent Task Beans ====================
 
-    /** 声明 Agent 任务队列 */
+    /** 声明 Agent 任务队列 并且设置持久化 durable:true*/
     @Bean
     public Queue agentTaskQueue() {
         return new Queue(AGENT_TASK_QUEUE, true);

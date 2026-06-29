@@ -83,8 +83,8 @@ public class ElasticsearchDocumentService {
         CreateIndexRequest request = CreateIndexRequest.of(c -> c
                 .index(indexName)
                 .settings(s -> s
-                        .numberOfShards("1")
-                        .numberOfReplicas("0")
+                        .numberOfShards("1")//主分片数
+                        .numberOfReplicas("0")//副分片数
                         // ES 9.x: refreshInterval 接受 Time 对象
                         .refreshInterval(t -> t.time("1s"))
                 )
