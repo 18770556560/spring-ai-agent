@@ -7,7 +7,7 @@ spring:
     password: guest
     # 虚拟主机，默认 /
     virtual-host: /
-    # 开启消息确认（生产可靠）
+    # 开启生产者确认机制（配合持久化，确保消息抵达MQ）
     publisher-confirm-type: correlated
     publisher-returns: true
     template:
